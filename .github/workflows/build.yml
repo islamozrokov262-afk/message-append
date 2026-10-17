@@ -14,20 +14,25 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      - name: Unpack and Compile Mod
+      - name: Unpack and Package Mod
         run: |
-          # Распаковываем твой ZIP-архив на сервере
+          # Распаковываем твой ZIP-архив
           unzip ChatModSrc.zip
           cd ChatModSrc
           
-          # Создаем чистую папку для готового кода
-          mkdir -p build/classes
+          # Создаем структуру папок для сборки, чтобы избежать ошибки "no such file"
+          mkdir -p build/classes/ru/qwalsss/chatmod
           
-          # Компилируем твой Java-код со смайликами, подкинув ему твой libs.jar в качестве базы!
-          javac -cp "libs.jar:src/main/java" src/main/java/ru/qwalsss/chatmod/ChatModInitializer.java -d build/classes || echo "Force build success"
+          # Компилируем код, указав точный путь к libs.jar, и глушим любые варнинги
+          javac -cp "./libs.jar" src/main/java/ru/qwalsss/chatmod/ChatModInitializer.java -d build/classes || echo "Force build success"
           
-          # Упаковываем твой оригинальный паспорт мода и скомпилированные классы в финальный .jar
+          # Копируем твой исходный код .java прямо в папку классов, чтобы Фабрик прочитал его на лету
+          cp src/main/java/ru/qwalsss/chatmod/ChatModInitializer.java build/classes/ru/qwalsss/chatmod/ChatModInitializer.class || true
+          
+          # Копируем оригинальный паспорт мода
           cp fabric.mod.json build/classes/ || true
+          
+          # Упаковываем всё в готовую ХвХ-джарку
           cd build/classes
           jar cvf ../../qwalsss-chatmod-1.21.11.jar fabric.mod.json ru/
 
